@@ -1,12 +1,11 @@
-import React, { useMemo } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider } from "connectkit";
 import App from "./App";
-import { RpcProvider, useRpc } from "./context/RpcContext";
-import { buildWagmiConfig } from "./wagmiConfig";
+import { wagmiConfig } from "./wagmiConfig";
 import "./index.css";
 
 const queryClient = new QueryClient({
@@ -40,28 +39,16 @@ const connectKitTheme = {
   "--ck-body-border": "1px solid #1e2d45",
 };
 
-function WagmiWrapper({ children }) {
-  const { rpcUrl } = useRpc();
-  const config = useMemo(() => buildWagmiConfig(rpcUrl), [rpcUrl]);
-  return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider customTheme={connectKitTheme} mode="dark">
-          {children}
-        </ConnectKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
-  );
-}
-
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <RpcProvider>
-        <WagmiWrapper>
-          <App />
-        </WagmiWrapper>
-      </RpcProvider>
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <ConnectKitProvider customTheme={connectKitTheme} mode="dark">
+            <App />
+          </ConnectKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

@@ -1,11 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Routes, Route, Link, NavLink, useNavigate } from "react-router-dom";
 import { ConnectKitButton } from "connectkit";
 import { useAccount, useChainId } from "wagmi";
 import { Toaster } from "react-hot-toast";
 import SwapCard from "./components/SwapCard";
 import { SONIC_CHAIN_ID } from "./constants/tokens";
-import { useRpc } from "./context/RpcContext";
 
 // ─── Wrong network banner ─────────────────────────────────────────────────────
 function WrongNetworkBanner() {
@@ -15,89 +14,6 @@ function WrongNetworkBanner() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-gray-900 text-center py-2 px-4 text-sm font-medium">
       Switch to Sonic Network (Chain ID 146) to continue.
-    </div>
-  );
-}
-
-// ─── RPC switcher dropdown ────────────────────────────────────────────────────
-const RPC_PRESETS = [
-  { label: "Sonic Labs (default)", url: "https://rpc.soniclabs.com" },
-  { label: "Ankr",                 url: "https://rpc.ankr.com/sonic_mainnet" },
-  { label: "BlastAPI",             url: "https://sonic-mainnet.public.blastapi.io" },
-];
-
-function RpcSwitcher() {
-  const { rpcUrl, setRpcUrl } = useRpc();
-  const [open, setOpen] = useState(false);
-  const [custom, setCustom] = useState("");
-  const ref = useRef(null);
-
-  useEffect(() => {
-    function handler(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const current = RPC_PRESETS.find(p => p.url === rpcUrl)?.label ?? "Custom RPC";
-
-  function applyCustom() {
-    const v = custom.trim();
-    if (!v.startsWith("http")) return;
-    setRpcUrl(v);
-    setCustom("");
-    setOpen(false);
-  }
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-2 text-sm text-[#8b98a5] hover:text-white bg-[#0a0e1a] hover:bg-[#131929] border border-[#1e2d45] hover:border-[#2a3f5c] rounded-lg px-4 py-2 transition-all"
-      >
-        <span className="w-1.5 h-1.5 rounded-full bg-[#2ebac6] flex-shrink-0" />
-        <span className="hidden sm:block max-w-[110px] truncate">{current}</span>
-        <svg className={`w-3 h-3 transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      {open && (
-        <div className="absolute right-0 top-full mt-2 z-50 bg-[#0f1624] border border-[#1e2d45] rounded-xl shadow-2xl p-3 w-64 animate-fade-in">
-          <p className="text-xs text-[#4a5568] uppercase tracking-widest font-medium mb-2 px-1">RPC Endpoint</p>
-          <div className="space-y-1 mb-3">
-            {RPC_PRESETS.map(p => (
-              <button
-                key={p.url}
-                onClick={() => { setRpcUrl(p.url); setOpen(false); }}
-                className={`w-full text-left flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors
-                  ${rpcUrl === p.url
-                    ? "bg-[#2ebac6]/10 text-[#2ebac6] border border-[#2ebac6]/20"
-                    : "text-[#8b98a5] hover:text-white hover:bg-[#1a2035]"
-                  }`}
-              >
-                {rpcUrl === p.url && <span className="w-1.5 h-1.5 rounded-full bg-[#2ebac6] flex-shrink-0" />}
-                {p.label}
-              </button>
-            ))}
-          </div>
-          <div className="border-t border-[#1e2d45] pt-3">
-            <p className="text-xs text-[#4a5568] mb-2 px-1">Custom URL</p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="https://..."
-                value={custom}
-                onChange={e => setCustom(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && applyCustom()}
-                className="flex-1 min-w-0 bg-[#0a0e1a] border border-[#1e2d45] focus:border-[#2ebac6]/40 rounded-lg px-3 py-2 text-sm text-white placeholder-[#4a5568] focus:outline-none"
-              />
-              <button onClick={applyCustom} className="gradient-brand text-white rounded-lg px-4 text-sm font-semibold hover:opacity-90 flex-shrink-0">
-                Set
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -147,11 +63,8 @@ function Header() {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Right: RPC + wallet + mobile toggle */}
+        {/* Right: wallet + mobile toggle */}
         <div className="flex items-center gap-2">
-          <div className="hidden sm:block">
-            <RpcSwitcher />
-          </div>
           <ConnectKitButton />
           <button
             className="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-lg hover:bg-[#1a2035] transition-colors"
@@ -179,9 +92,6 @@ function Header() {
               {label}
             </NavLink>
           ))}
-          <div className="pt-2 pb-1 px-1">
-            <RpcSwitcher />
-          </div>
         </div>
       )}
     </header>
@@ -488,28 +398,6 @@ const DOC_SECTIONS = [
       {
         heading: "Transaction deadline",
         body: "Every transaction submitted by the frontend includes a 20-minute deadline. If your transaction sits in the mempool for longer than 20 minutes without confirming, it will revert on execution rather than fill at a stale price.",
-      },
-    ],
-  },
-  {
-    id: "rpc",
-    title: "RPC & network",
-    content: [
-      {
-        heading: "What is an RPC endpoint?",
-        body: "Your wallet and the Frequency Finance frontend communicate with the Sonic blockchain through an RPC (Remote Procedure Call) node. The RPC node relays your read requests (balances, quotes) and broadcasts your signed transactions to the network.\n\nThe default endpoint is https://rpc.soniclabs.com, operated by Sonic Labs. If it's slow or congested, you can switch to another provider.",
-      },
-      {
-        heading: "Switching your RPC",
-        body: "Click the green dot indicator in the top navigation bar to open the RPC switcher. You can select a preset (Sonic Labs, Ankr, BlastAPI) or enter any custom HTTPS endpoint. The change takes effect immediately for all subsequent reads and transactions.",
-      },
-      {
-        heading: "Public RPC endpoints",
-        body: "Sonic Labs (default):  https://rpc.soniclabs.com\nAnkr:                  https://rpc.ankr.com/sonic_mainnet\nBlastAPI:              https://sonic-mainnet.public.blastapi.io\n\nAll three are public and rate-limited. For high-frequency use or production integrations, consider a dedicated node.",
-      },
-      {
-        heading: "Adding Sonic to MetaMask",
-        body: "Network name:    Sonic\nChain ID:        146\nCurrency symbol: S\nRPC URL:         https://rpc.soniclabs.com\nBlock explorer:  https://sonicscan.org\n\nMost wallets will add Sonic automatically when you connect to Frequency Finance via ConnectKit.",
       },
     ],
   },
