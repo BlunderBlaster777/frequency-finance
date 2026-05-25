@@ -26,7 +26,7 @@ function Logo() {
         src="/logo.png"
         alt="Frequency Finance"
         className="w-auto transition-opacity group-hover:opacity-80"
-        style={{ filter: "invert(1)", height: "80px", maxWidth: "320px", objectFit: "contain" }}
+        style={{ filter: "invert(1)", height: "44px", maxWidth: "260px", objectFit: "contain" }}
       />
     </Link>
   );
