@@ -1,0 +1,25 @@
+# Environment / secrets — NEVER commit
+.env
+.env.local
+.env.*.local
+
+# Hardhat
+cache/
+artifacts/
+deployments/
+
+# Node
+node_modules/
+.pnpm-store/
+
+# Frontend build output
+frontend/dist/
+frontend/.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
