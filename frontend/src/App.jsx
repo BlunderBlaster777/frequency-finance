@@ -156,13 +156,8 @@ function LandingPage() {
       {/* Hero */}
       <section className="max-w-6xl mx-auto w-full px-4 md:px-6 pt-20 pb-24">
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 border border-[#1e2d45] bg-[#0f1624] rounded-full px-5 py-2 text-sm text-[#8b98a5] font-medium mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2ebac6]" />
-            Live on Sonic Mainnet · Chain ID 146
-          </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.1] tracking-tight mb-6">
-            The smarter way<br />to swap on{" "}
-            <span className="text-gradient">Sonic.</span>
+            The smarter way<br />to swap.
           </h1>
           <p className="text-[#8b98a5] text-xl leading-relaxed mb-10 max-w-lg">
             Frequency Finance aggregates every DEX on Sonic chain, routes your trade through the best available pool, and shows you exactly what you're getting before you sign.
