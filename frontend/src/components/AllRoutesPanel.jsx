@@ -9,7 +9,11 @@ const TYPE_BADGE = {
   DLMM:    { label: "dlmm", cls: "text-[#67e8f9] bg-[#67e8f9]/10"   },
 };
 
-function RouteRow({ route, tokenOut, isBest, rank }) {
+function routeKey(route) {
+  return `${route.dexName}::${route.meta?.type ?? "UniV2"}::${route.meta?.fee ?? ""}`;
+}
+
+function RouteRow({ route, tokenOut, isBest, isSelected, rank, onSelect }) {
   const info    = DEX_INFO[route.dexName] ?? { color: "#2a3f5c" };
   const typeKey = route.meta?.type ?? "UniV2";
   const badge   = TYPE_BADGE[typeKey] ?? TYPE_BADGE.UniV2;
@@ -18,19 +22,25 @@ function RouteRow({ route, tokenOut, isBest, rank }) {
   const stable  = route.stableFlags?.[0] === true;
 
   return (
-    <div className={`flex items-center justify-between px-4 py-3.5 rounded-xl border transition-colors
-      ${isBest
-        ? "bg-[#2ebac6]/5 border-[#2ebac6]/20"
-        : "bg-[#0a0e1a] border-[#1e2d45] hover:border-[#2a3f5c]"
-      }`}>
+    <button
+      onClick={() => onSelect(route)}
+      className={`w-full text-left flex items-center justify-between px-4 py-3.5 rounded-xl border transition-all
+        ${isSelected
+          ? "bg-[#2ebac6]/10 border-[#2ebac6]/40 ring-1 ring-[#2ebac6]/30"
+          : isBest
+            ? "bg-[#1a2035] border-[#2a3f5c] hover:border-[#3a4f6c]"
+            : "bg-[#0a0e1a] border-[#1e2d45] hover:border-[#2a3f5c] hover:bg-[#0f1624]"
+        }`}
+    >
       <div className="flex items-center gap-3 min-w-0">
-        <span className={`text-sm font-bold w-6 text-center flex-shrink-0 ${isBest ? "text-[#2ebac6]" : "text-[#4a5568]"}`}>
-          {isBest ? "★" : `${rank}`}
+        <span className={`text-sm font-bold w-6 text-center flex-shrink-0
+          ${isSelected ? "text-[#2ebac6]" : isBest ? "text-[#2ebac6]" : "text-[#4a5568]"}`}>
+          {isSelected ? "✓" : isBest ? "★" : `${rank}`}
         </span>
         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: info.color }} />
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`text-sm font-semibold truncate ${isBest ? "text-white" : "text-[#8b98a5]"}`}>
+            <span className={`text-sm font-semibold truncate ${isSelected || isBest ? "text-white" : "text-[#8b98a5]"}`}>
               {route.dexName}
             </span>
             <span className={`text-xs font-medium px-2 py-0.5 rounded ${badge.cls}`}>
@@ -54,18 +64,18 @@ function RouteRow({ route, tokenOut, isBest, rank }) {
       </div>
 
       <div className="text-right flex-shrink-0 ml-4">
-        <div className={`text-sm font-semibold tabular-nums ${isBest ? "text-white" : "text-[#8b98a5]"}`}>
+        <div className={`text-sm font-semibold tabular-nums ${isSelected || isBest ? "text-white" : "text-[#8b98a5]"}`}>
           {amount < 0.000001 && amount > 0
             ? amount.toExponential(3)
             : amount.toFixed(Math.min(6, tokenOut?.decimals ?? 6))}
         </div>
         <div className="text-xs text-[#4a5568]">{tokenOut?.symbol}</div>
       </div>
-    </div>
+    </button>
   );
 }
 
-export default function AllRoutesPanel({ allRoutes, tokenIn, tokenOut, loading }) {
+export default function AllRoutesPanel({ allRoutes, tokenIn, tokenOut, loading, selectedRoute, onSelectRoute }) {
   if (loading) {
     return (
       <div className="space-y-2 animate-pulse">
@@ -82,11 +92,13 @@ export default function AllRoutesPanel({ allRoutes, tokenIn, tokenOut, loading }
     );
   }
 
+  const selectedKey = selectedRoute ? routeKey(selectedRoute) : null;
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between mb-1 px-1">
         <span className="text-sm text-[#4a5568]">{allRoutes.length} route{allRoutes.length !== 1 ? "s" : ""}</span>
-        <span className="text-sm text-[#2ebac6]">Best highlighted</span>
+        <span className="text-sm text-[#2ebac6]">Click to select</span>
       </div>
       {allRoutes.map((route, i) => (
         <RouteRow
@@ -94,7 +106,9 @@ export default function AllRoutesPanel({ allRoutes, tokenIn, tokenOut, loading }
           route={route}
           tokenOut={tokenOut}
           isBest={i === 0}
+          isSelected={routeKey(route) === selectedKey}
           rank={i + 1}
+          onSelect={onSelectRoute}
         />
       ))}
     </div>

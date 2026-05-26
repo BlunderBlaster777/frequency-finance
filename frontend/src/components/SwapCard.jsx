@@ -20,8 +20,38 @@ export default function SwapCard() {
   const [slippageBps, setSlippageBps] = useState(DEFAULT_SLIPPAGE_BPS);
   const [showRoutes,  setShowRoutes]  = useState(false);
 
-  const { bestQuote: quote, allRoutes, loading: quoteLoading, error: quoteError } =
+  const [selectedRoute, setSelectedRoute] = useState(null);
+
+  const { bestQuote, allRoutes, loading: quoteLoading, error: quoteError } =
     useQuote({ tokenIn, tokenOut, amountIn });
+
+  // Resolve the active quote: prefer user-selected route if it's still in results, else best
+  const activeRoute = (() => {
+    if (!allRoutes.length) return null;
+    if (selectedRoute) {
+      const still = allRoutes.find(r =>
+        r.dexName === selectedRoute.dexName &&
+        r.meta?.type === selectedRoute.meta?.type &&
+        r.meta?.fee === selectedRoute.meta?.fee
+      );
+      if (still) return still;
+    }
+    return allRoutes[0] ?? null;
+  })();
+
+  const quote = activeRoute
+    ? {
+        amountOut:          activeRoute.amountOut,
+        amountOutFormatted: formatUnits(activeRoute.amountOut, tokenOut?.decimals ?? 18),
+        dexName:            activeRoute.dexName,
+        dexIndex:           activeRoute.dexIndex,
+        path:               activeRoute.path,
+        stableFlags:        activeRoute.stableFlags,
+        meta:               activeRoute.meta,
+        priceImpactBps:     0n,
+        priceImpactPercent: "0.00",
+      }
+    : null;
 
   const { swap, needsApproval, step, isLoading: swapLoading } = useSwap({
     tokenIn, tokenOut, amountIn, quote, slippageBps,
@@ -73,6 +103,7 @@ export default function SwapCard() {
     setTokenIn(tokenOut);
     setTokenOut(tokenIn);
     setAmountIn(quote ? quote.amountOutFormatted : "");
+    setSelectedRoute(null);
   }
 
   function getButtonState() {
@@ -133,11 +164,11 @@ export default function SwapCard() {
               <input
                 type="number" min="0" step="any" placeholder="0"
                 value={amountIn}
-                onChange={e => setAmountIn(e.target.value)}
+                onChange={e => { setAmountIn(e.target.value); setSelectedRoute(null); }}
                 className="flex-1 bg-transparent text-5xl font-bold text-white placeholder-[#1e2d45] focus:outline-none min-w-0 w-0 pb-1"
               />
               <div className="flex-shrink-0 pb-1">
-                <TokenSelector selected={tokenIn} onChange={setTokenIn} excludeToken={tokenOut} />
+                <TokenSelector selected={tokenIn} onChange={t => { setTokenIn(t); setSelectedRoute(null); }} excludeToken={tokenOut} />
               </div>
             </div>
           </div>
@@ -170,7 +201,7 @@ export default function SwapCard() {
                 {outputDisplay || "0"}
               </div>
               <div className="flex-shrink-0 pb-1">
-                <TokenSelector selected={tokenOut} onChange={setTokenOut} excludeToken={tokenIn} />
+                <TokenSelector selected={tokenOut} onChange={t => { setTokenOut(t); setSelectedRoute(null); }} excludeToken={tokenIn} />
               </div>
             </div>
           </div>
@@ -216,7 +247,14 @@ export default function SwapCard() {
               </button>
               {showRoutes && (
                 <div className="mt-2 animate-fade-in">
-                  <AllRoutesPanel allRoutes={allRoutes} tokenIn={tokenIn} tokenOut={tokenOut} loading={quoteLoading} />
+                  <AllRoutesPanel
+                    allRoutes={allRoutes}
+                    tokenIn={tokenIn}
+                    tokenOut={tokenOut}
+                    loading={quoteLoading}
+                    selectedRoute={activeRoute}
+                    onSelectRoute={r => { setSelectedRoute(r); setShowRoutes(false); }}
+                  />
                 </div>
               )}
             </div>
