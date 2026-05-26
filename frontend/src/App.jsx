@@ -184,10 +184,10 @@ function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { label: "DEXes aggregated", value: "6"         },
-              { label: "Protocol types",   value: "5"         },
-              { label: "Protocol fee",     value: "0.05%"     },
-              { label: "Network",          value: "Sonic 146" },
+              { label: "DEXes aggregated", value: "6"     },
+              { label: "Protocol types",   value: "5"     },
+              { label: "Protocol fee",     value: "0.05%" },
+              { label: "Tx deadline",      value: "20 min" },
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-4xl font-bold text-white mb-2">{value}</div>
