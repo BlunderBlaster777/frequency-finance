@@ -327,24 +327,46 @@ const DOC_SECTIONS = [
     title: "Contract addresses",
     content: [
       {
-        heading: "Sonic Mainnet (chain ID 146)",
-        body: "All contracts are deployed on Sonic mainnet. Verify addresses on Sonicscan before interacting.",
+        heading: "Source code",
+        body: "The router contract and frontend are fully open source.",
+        links: [
+          { label: "GitHub — BlunderBlaster777/frequency-finance", href: "https://github.com/BlunderBlaster777/frequency-finance" },
+        ],
       },
       {
         heading: "SonicAggregatorRouter",
-        body: "0xf68bA721Ff5ec057957cFd5F0278BC85A3841b00\n\nThis is the single entry point for all swaps. It holds the DEX registry and handles quoting, fee deduction, and execution.",
+        body: "The single entry point for all swaps. Holds the DEX registry and handles quoting, fee deduction, and execution.",
+        links: [
+          { label: "0xf68bA721Ff5ec057957cFd5F0278BC85A3841b00", href: "https://sonicscan.org/address/0xf68bA721Ff5ec057957cFd5F0278BC85A3841b00" },
+        ],
       },
       {
         heading: "Wrapped Sonic (wS)",
-        body: "0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38\n\nThe canonical ERC-20 wrapper for native S. The router uses this for all internal accounting on native S paths.",
+        body: "The canonical ERC-20 wrapper for native S. Used for all internal accounting on native S paths.",
+        links: [
+          { label: "0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38", href: "https://sonicscan.org/address/0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38" },
+        ],
       },
       {
         heading: "Off-chain quoters",
-        body: "SpookySwap V3 QuoterV2:    0x3F2026Cae76b987C4002e62B9dF70988b4388234\nSwapX Algebra Quoter:      0xd74a9Bd1C98B2CbaB5823107eb2BE9C474bEe09A\nMetropolis LB Quoter:      0x56eaa884F29620fD6914827AaAE9Ee6a5C383149\n\nThese contracts are read-only and are only called by the frontend during the quoting phase. They are never called during execution.",
+        body: "Read-only contracts called by the frontend during quoting only — never during execution.",
+        links: [
+          { label: "SpookySwap V3 QuoterV2 — 0x3F2026Cae76b987C4002e62B9dF70988b4388234", href: "https://sonicscan.org/address/0x3F2026Cae76b987C4002e62B9dF70988b4388234" },
+          { label: "SwapX Algebra Quoter — 0xd74a9Bd1C98B2CbaB5823107eb2BE9C474bEe09A", href: "https://sonicscan.org/address/0xd74a9Bd1C98B2CbaB5823107eb2BE9C474bEe09A" },
+          { label: "Metropolis LB Quoter — 0x56eaa884F29620fD6914827AaAE9Ee6a5C383149", href: "https://sonicscan.org/address/0x56eaa884F29620fD6914827AaAE9Ee6a5C383149" },
+        ],
       },
       {
         heading: "DEX routers",
-        body: "Shadow Exchange (Solidly):  0x1D368773735ee1E678950B7A97bcA2CafB330CDc\nSpookySwap V2:              0xb4315e873dBcf96Ffd0acd8EA43f689D8c20fB30\nSpookySwap V3:              0xaA54D4d80e92fB98Ebb5c1c5d2a1E7e9B87A3f5c\nSwapX:                      0xcC6169aA1E879d3a4227536671F85afdb2d23fAD\nMetropolis V2:              0x23d6b0A0A4E66571E4CA9B0DC5e31B9b7Cf75df6\nMetropolis DLMM:            0x8798ADEd8A4Dd7D9dc601336D0766E3F4Df27Cd8",
+        body: "Third-party contracts that execute the actual swaps.",
+        links: [
+          { label: "Shadow Exchange — 0x1D368773735ee1E678950B7A97bcA2CafB330CDc", href: "https://sonicscan.org/address/0x1D368773735ee1E678950B7A97bcA2CafB330CDc" },
+          { label: "SpookySwap V2 — 0xb4315e873dBcf96Ffd0acd8EA43f689D8c20fB30", href: "https://sonicscan.org/address/0xb4315e873dBcf96Ffd0acd8EA43f689D8c20fB30" },
+          { label: "SpookySwap V3 — 0xaA54D4d80e92fB98Ebb5c1c5d2a1E7e9B87A3f5c", href: "https://sonicscan.org/address/0xaA54D4d80e92fB98Ebb5c1c5d2a1E7e9B87A3f5c" },
+          { label: "SwapX — 0xcC6169aA1E879d3a4227536671F85afdb2d23fAD", href: "https://sonicscan.org/address/0xcC6169aA1E879d3a4227536671F85afdb2d23fAD" },
+          { label: "Metropolis V2 — 0x23d6b0A0A4E66571E4CA9B0DC5e31B9b7Cf75df6", href: "https://sonicscan.org/address/0x23d6b0A0A4E66571E4CA9B0DC5e31B9b7Cf75df6" },
+          { label: "Metropolis DLMM — 0x8798ADEd8A4Dd7D9dc601336D0766E3F4Df27Cd8", href: "https://sonicscan.org/address/0x8798ADEd8A4Dd7D9dc601336D0766E3F4Df27Cd8" },
+        ],
       },
     ],
   },
@@ -462,7 +484,7 @@ function DocsPage() {
         <div className="bg-[#0f1624] border border-[#1e2d45] rounded-2xl p-7 md:p-9">
           <h1 className="text-2xl font-bold text-white mb-8 pb-6 border-b border-[#1e2d45]">{section?.title}</h1>
           <div className="space-y-8">
-            {section?.content.map(({ heading, body }, i) => (
+            {section?.content.map(({ heading, body, links }, i) => (
               <div key={i}>
                 {heading && <h3 className="text-lg font-semibold text-white mb-3">{heading}</h3>}
                 {body && body.split("\n\n").map((para, j) => (
@@ -477,6 +499,24 @@ function DocsPage() {
                     })}
                   </div>
                 ))}
+                {links && links.length > 0 && (
+                  <div className="mt-3 flex flex-col gap-2">
+                    {links.map(({ label, href }) => (
+                      <a
+                        key={href}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 font-mono text-sm text-[#2ebac6] hover:text-white bg-[#0a0e1a] border border-[#1e2d45] hover:border-[#2ebac6]/40 rounded-lg px-4 py-2.5 transition-all break-all"
+                      >
+                        <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        {label}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
